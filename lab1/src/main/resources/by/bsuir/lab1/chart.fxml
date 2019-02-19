@@ -15,6 +15,7 @@
   <rowConstraints>
     <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
   </rowConstraints>
   <children>
     <LineChart fx:id="linearRegressionChart" disable="true" prefHeight="400.0" prefWidth="685.0"
@@ -26,7 +27,9 @@
         <NumberAxis side="LEFT"/>
       </yAxis>
     </LineChart>
-    <Label text="Correlation Coefficient" GridPane.rowIndex="1"/>
+    <Label text="Correlation Coefficient:" GridPane.rowIndex="1"/>
     <Label fx:id="correlationValueLabel" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+    <Label text="Equation:" GridPane.rowIndex="2"/>
+    <Label fx:id="equationLabel" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
   </children>
 </GridPane>

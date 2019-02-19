@@ -22,6 +22,8 @@ public class Controller implements Initializable {
   private LineChart<Double, Double> linearRegressionChart;
   @FXML
   private Label correlationValueLabel;
+  @FXML
+  private Label equationLabel;
 
   public void initialize(URL url, ResourceBundle resourceBundle) {
     try (InputStream stream = getClass().getResourceAsStream("/18-bands.csv")) {
@@ -33,6 +35,8 @@ public class Controller implements Initializable {
       }
       linearRegressionChart.getData().add(createLinearRegressionSeries(regression));
       correlationValueLabel.setText(Double.toString(regression.getR()));
+      equationLabel.setText(String.format("y = %.2f + %.2f * x", regression.getIntercept(),
+          regression.getSlope()));
     } catch (IOException e) {
       System.err.println("Data file not found.");
       System.exit(1);
