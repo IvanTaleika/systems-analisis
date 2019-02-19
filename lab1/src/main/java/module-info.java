@@ -5,6 +5,7 @@ module lab1 {
   requires com.fasterxml.jackson.databind;
   requires com.fasterxml.jackson.dataformat.csv;
   requires com.fasterxml.jackson.core;
+  requires commons.math3;
 
   opens by.bsuir.lab1 to javafx.fxml;
   opens by.bsuir.lab1.ui to javafx.fxml;

@@ -2,20 +2,31 @@
 
 <?import javafx.scene.chart.LineChart?>
 <?import javafx.scene.chart.NumberAxis?>
-<?import javafx.scene.layout.AnchorPane?>
-
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-  prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.172-ea"
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<GridPane prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.172-ea"
   xmlns:fx="http://javafx.com/fxml/1" fx:controller="by.bsuir.lab1.ui.Controller">
-  <LineChart fx:id="linearRegressionChart" disable="true" layoutX="28.0" layoutY="-39.0"
-    prefHeight="400.0" prefWidth="600.0" stylesheets="@chart.css" title="Linear regression"
-    AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-    AnchorPane.topAnchor="0.0">
-    <xAxis>
-      <NumberAxis side="BOTTOM"/>
-    </xAxis>
-    <yAxis>
-      <NumberAxis side="LEFT"/>
-    </yAxis>
-  </LineChart>
-</AnchorPane>
+  <columnConstraints>
+    <ColumnConstraints hgrow="SOMETIMES" maxWidth="394.0" minWidth="10.0" prefWidth="137.0"/>
+    <ColumnConstraints hgrow="SOMETIMES" maxWidth="632.0" minWidth="10.0" prefWidth="463.0"/>
+  </columnConstraints>
+  <rowConstraints>
+    <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
+    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+  </rowConstraints>
+  <children>
+    <LineChart fx:id="linearRegressionChart" disable="true" prefHeight="400.0" prefWidth="685.0"
+      stylesheets="@chart.css" title="Linear regression" GridPane.columnSpan="2">
+      <xAxis>
+        <NumberAxis side="BOTTOM"/>
+      </xAxis>
+      <yAxis>
+        <NumberAxis side="LEFT"/>
+      </yAxis>
+    </LineChart>
+    <Label text="Correlation Coefficient" GridPane.rowIndex="1"/>
+    <Label fx:id="correlationValueLabel" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+  </children>
+</GridPane>

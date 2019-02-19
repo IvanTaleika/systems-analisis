@@ -26,7 +26,7 @@
           </execution>
         </executions>
         <configuration>
-          <mainClass>HelloFX</mainClass>
+          <mainClass>by.bsuir.lab1.Main</mainClass>
         </configuration>
       </plugin>
       <plugin>
@@ -60,6 +60,11 @@
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
       <version>${com.fasterxml.jackson.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-math3</artifactId>
+      <version>3.6.1</version>
     </dependency>
 
   </dependencies>
