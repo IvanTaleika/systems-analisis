@@ -2,11 +2,11 @@ package by.bsuir.sa
 
 import com.johnsnowlabs.nlp.annotators.{Normalizer, Stemmer, Tokenizer}
 import com.johnsnowlabs.nlp.{DocumentAssembler, Finisher}
-import org.apache.spark.ml.feature.StopWordsRemover
+import org.apache.spark.ml.feature.{CountVectorizer, CountVectorizerModel, StopWordsRemover}
 import org.apache.spark.ml.{Pipeline, PipelineModel}
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.{DataFrame, SparkSession}
 
-object CleanerModelFactory {
+object ModelFactory {
   private val documentAssembler =
     new DocumentAssembler().setInputCol("text").setOutputCol("document")
   private val tokenizer =
@@ -34,9 +34,18 @@ object CleanerModelFactory {
         finisher,
         cleaner))
 
-  def model(spark: SparkSession): PipelineModel = {
+  def cleanerModel(spark: SparkSession): PipelineModel = {
     import spark.implicits._
     pipeline.fit(spark.createDataset(Seq.empty[String]).toDF("text"))
+  }
+
+  def wordCountModel(educationDf: DataFrame): CountVectorizerModel = {
+    val vectorizer = new CountVectorizer()
+      .setInputCol("result")
+      .setOutputCol("features")
+      .setVocabSize(10)
+      .setMinDF(1)
+    vectorizer.fit(educationDf)
   }
 
 }
