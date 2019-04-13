@@ -24,7 +24,7 @@ object CleanerModelFactory {
   private val cleaner = new StopWordsRemover()
     .setInputCol("finished")
     .setOutputCol("result")
-  cleaner.setStopWords(cleaner.getStopWords ++ Array("", "ar", "thi", "wa", "hi", "thei", "u", "us"))
+  cleaner.setStopWords(cleaner.getStopWords ++ Array("", "ar", "us", "thi", "wa"))
   private val pipeline: Pipeline = new Pipeline()
     .setStages(
       Array(documentAssembler,
