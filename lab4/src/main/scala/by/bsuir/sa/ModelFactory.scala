@@ -24,25 +24,28 @@ object ModelFactory {
   private val cleaner = new StopWordsRemover()
     .setInputCol("finished")
     .setOutputCol("result")
-  cleaner.setStopWords(cleaner.getStopWords ++ Array("", "ar", "us", "thi", "wa"))
+  cleaner.setStopWords(
+    cleaner.getStopWords
+      ++ Array("", "ar", "us", "thi", "wa", "+", "d", "also", "thei", "nt"))
   private val pipeline: Pipeline = new Pipeline()
     .setStages(
       Array(documentAssembler,
-        tokenizer,
-        normalizer,
-        stemmer,
-        finisher,
-        cleaner))
+            tokenizer,
+            normalizer,
+            stemmer,
+            finisher,
+            cleaner))
 
   def cleanerModel(spark: SparkSession): PipelineModel = {
     import spark.implicits._
     pipeline.fit(spark.createDataset(Seq.empty[String]).toDF("text"))
   }
 
-  def wordCountModel(educationDf: DataFrame): CountVectorizerModel = {
+  def wordCountModel(educationDf: DataFrame,
+                     outputColName: String): CountVectorizerModel = {
     val vectorizer = new CountVectorizer()
       .setInputCol("result")
-      .setOutputCol("features")
+      .setOutputCol(outputColName)
       .setVocabSize(10)
       .setMinDF(1)
     vectorizer.fit(educationDf)

@@ -11,3 +11,4 @@ libraryDependencies += "org.apache.spark" %% "spark-sql" % sparkVersion
 libraryDependencies += "org.apache.spark" %% "spark-mllib" % sparkVersion
 libraryDependencies += "com.johnsnowlabs.nlp" %% "spark-nlp" % "2.0.1"
 libraryDependencies += "commons-io" % "commons-io" % "2.6"
+
