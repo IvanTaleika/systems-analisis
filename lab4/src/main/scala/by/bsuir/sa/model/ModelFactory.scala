@@ -1,7 +1,8 @@
-package by.bsuir.sa
+package by.bsuir.sa.model
 
 import com.johnsnowlabs.nlp.annotators.{Normalizer, Stemmer, Tokenizer}
 import com.johnsnowlabs.nlp.{DocumentAssembler, Finisher}
+import org.apache.spark.ml.clustering.{KMeans, KMeansModel}
 import org.apache.spark.ml.feature.{CountVectorizer, CountVectorizerModel, StopWordsRemover}
 import org.apache.spark.ml.{Pipeline, PipelineModel}
 import org.apache.spark.sql.{DataFrame, SparkSession}
@@ -36,7 +37,7 @@ object ModelFactory {
             finisher,
             cleaner))
 
-  def cleanerModel(spark: SparkSession): PipelineModel = {
+  def cleanerModel(implicit spark: SparkSession): PipelineModel = {
     import spark.implicits._
     pipeline.fit(spark.createDataset(Seq.empty[String]).toDF("text"))
   }
@@ -49,6 +50,13 @@ object ModelFactory {
       .setVocabSize(10)
       .setMinDF(1)
     vectorizer.fit(educationDf)
+  }
+
+  def kMeansModel(educationDf: DataFrame): KMeansModel ={
+    val kMeans = new KMeans()
+      .setK(3)
+      .setFeaturesCol("wordsCount")
+    kMeans.fit(educationDf)
   }
 
 }

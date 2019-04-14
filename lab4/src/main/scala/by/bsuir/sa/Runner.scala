@@ -2,11 +2,10 @@ package by.bsuir.sa
 
 import java.nio.charset.Charset
 
+import by.bsuir.sa.model.ModelFactory
+import by.bsuir.sa.ui.OutputUtils
 import org.apache.commons.io.IOUtils
-import org.apache.spark.ml.clustering.KMeans
-import org.apache.spark.ml.feature.CountVectorizerModel
 import org.apache.spark.ml.linalg.{DenseVector, SparseVector}
-import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
@@ -15,13 +14,13 @@ object Runner extends App {
   val medicineColName = "medicineFeatures"
   val atheismColName = "atheismFeatures"
 
-  val spark =
+  implicit val spark: SparkSession =
     SparkSession.builder().master("local[*]").appName("lab4").getOrCreate()
+  spark.sparkContext.setLogLevel("ERROR")
 
   import spark.implicits._
 
-  spark.sparkContext.setLogLevel("WARN")
-  val cleanerModel = ModelFactory.cleanerModel(spark)
+  val cleanerModel = ModelFactory.cleanerModel
 
   val graphicsDf = createDf("graphics", 9)
   val medicineDf = createDf("medicine", 9)
@@ -38,38 +37,40 @@ object Runner extends App {
   val medicineTransformed = wordCountVectorized(medicineDf)
   val atheismTransformed = wordCountVectorized(atheismDf)
 
-  spark
-    .createDataFrame(
-      createVocabularyWithCount(graphicsTransformed.limit(4),
-                                graphicsColName,
-                                graphicsModel)
-        .join(createVocabularyWithCount(medicineTransformed.limit(4),
-                                        medicineColName,
-                                        medicineModel))
-        .join(createVocabularyWithCount(atheismTransformed.limit(4),
-                                        atheismColName,
-                                        atheismModel))
-        .map(t => (t._1, t._2._1._1, t._2._1._2, t._2._2)))
-    .toDF("index", "graphics", "medicine", "atheism")
-    .sort($"index")
-    .show(false)
-
-  val kMeans = new KMeans()
-    .setK(3)
-    .setFeaturesCol("wordsCount")
-    .setPredictionCol("clusterIndex")
-  println(kMeans.explainParams())
-  val kMeansDataset = graphicsTransformed
+  OutputUtils.showVocabulary(
+    graphicsTransformed.limit(4),
+    graphicsColName,
+    graphicsModel,
+    medicineTransformed.limit(4),
+    medicineColName,
+    medicineModel,
+    atheismTransformed.limit(4),
+    atheismColName,
+    atheismModel
+  )
+  val educationDf = graphicsTransformed
     .limit(4)
     .union(medicineTransformed.limit(4))
     .union(atheismTransformed.limit(4))
 
-  val kMeansModel = kMeans.fit(kMeansDataset)
-  println(kMeansModel.clusterCenters.mkString(" "))
+  val kMeansModel = ModelFactory.kMeansModel(educationDf)
 
+  println("Graphics")
   kMeansModel.transform(graphicsTransformed).show()
+  println("Medicine")
   kMeansModel.transform(medicineTransformed).show()
+  println("Atheism")
   kMeansModel.transform(atheismTransformed).show()
+
+  println(s"Clusters centres ${kMeansModel.clusterCenters.mkString(" ")}")
+
+  OutputUtils.showClusters3dChart(
+    kMeansModel.clusterCenters,
+    educationDf,
+    graphicsTransformed.sort('index.desc).limit(6),
+    medicineTransformed.sort('index.desc).limit(6),
+    atheismTransformed.sort('index.desc).limit(6)
+  )
 
   def createDf(folder: String, n: Int): DataFrame = {
     cleanerModel.transform(
@@ -83,7 +84,6 @@ object Runner extends App {
   }
 
   def wordCountVectorized(df: DataFrame): DataFrame = {
-
     val countWords = udf(
       (v1: SparseVector, v2: SparseVector, v3: SparseVector) =>
         new DenseVector(
@@ -94,18 +94,6 @@ object Runner extends App {
                   countWords($"graphicsFeatures",
                              $"medicineFeatures",
                              $"atheismFeatures"))
-  }
-
-  def createVocabularyWithCount(
-      df: DataFrame,
-      colName: String,
-      model: CountVectorizerModel): RDD[(Int, (Double, String))] = {
-    df.rdd
-      .map(_.getAs[SparseVector](colName))
-      .flatMap(v => v.indices.zip(v.values))
-      .reduceByKey(_ + _)
-      .join(spark.sparkContext.parallelize(
-        model.vocabulary.zipWithIndex.map(t => (t._2, t._1)).toSeq))
   }
 
 }
